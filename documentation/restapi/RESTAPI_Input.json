@@ -1,0 +1,40 @@
+[
+    {
+      "ModuleInstanceName": "TempSensor",
+      "Module": "SimulatedTemperatureSensor",
+      "DesiredProperties": "{\"name\":\"TempSensor\"}",
+      "Routes": [
+        {
+          "RouteInstanceName": "TempSensorToIoTHub",
+          "FromModule": "SimulatedTemperatureSensor",
+          "ToModule": null,
+          "FromChannel": "tempout",
+          "ToChannel": null,
+          "ToIoThub": true
+        },
+        {
+          "RouteInstanceName": "TempSensorToPySend",
+          "FromModule": "SimulatedTemperatureSensor",
+          "ToModule": "SimulatedTemperatureSensor",
+          "FromChannel": "tempout",
+          "ToChannel": "tempin",
+          "ToIoThub": false
+        }
+      ]
+    },
+    {
+      "ModuleInstanceName": "PySende",
+      "Module": "PySendModule",
+      "DesiredProperties": "{\"name\":\"pysender\"}",
+      "Routes": [
+        {
+          "RouteInstanceName": "PySenderToIoThub",
+          "FromModule": "PySendModule",
+          "ToModule": null,
+          "FromChannel": "triggerout",
+          "ToChannel": null,
+          "ToIoThub": true
+        }
+      ]
+    }
+  ]
