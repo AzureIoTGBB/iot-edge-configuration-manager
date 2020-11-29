@@ -136,7 +136,7 @@ The sample implementation demonstrates the use of REST API and PowerApps as the 
 ![REST API Deployment](./media/restapiflow.png) 
 REST API accepts a JSON document that defines the modules, desired properties and routes for each of the modules that constitutes the workload. The REST API is implemented in Azure Functions and it uses [Azure IoT Hub Service .NET SDK](https://github.com/Azure/azure-iot-sdk-csharp) to interact with Azure IoT Hub for deployment to IoT Edge. [CosmosDB](https://docs.microsoft.com/en-us/azure/cosmos-db/introduction) is used to store templates for Edge Manifest & Modules.
 
-Please read this [document](./documentation/restapi/restapi-sample.md) for configuring and deploying the Azure Function.
+Please read this [document](./documentation/restapi/restapi-overview.md) for configuring and deploying the Azure Function.
 
 
 ## PowerApps Sample
