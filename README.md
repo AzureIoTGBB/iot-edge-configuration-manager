@@ -2,7 +2,7 @@ readme.md
 # IoT Edge Configuration Management
 
 
-This project provides an approach to configure variables workloads on a fleet of IoT Edge. A workload is a one or more Docker Containers running as IoT Edge Modules.
+This project provides an approach to configure workloads on a fleet of IoT Edge. A workload is a one or more Docker Containers running as IoT Edge Modules.
 
 <br>
 
@@ -30,7 +30,7 @@ For more information, see the [Code of Conduct FAQ](https://opensource.microsoft
 ## Solution goals
 
 The goal of this solution is as follows:
-* Ability to visually define and configure an IoT Edge workload using PowerApps.
+* Ability to define and configure an IoT Edge workload using PowerApps.
 * Ability to configure a fleet of IoT Edge devices using REST API.
 * Ability to build configuration management like concepts for IoT Edge.
 * Ability to enable Operations team to manage Azure IoT Edge workloads.
@@ -42,7 +42,7 @@ For example, consider a retail store with multiple IoT devices such as Chillers,
 As the number of locations increases and with the variability in number of camera per location and camera configurations (IP address, camera type, etc.),the management and deployment of the workloads will tend to get complex and does not readily fit into IoT edge [Automatic Deployment for single devices or at scale](https://docs.microsoft.com/en-us/azure/iot-edge/module-deployment-monitoring). Considering each Edge is different and has variability in configurations, a single deployment manifest will not meet the needs of all Edges. 
 
 This solution demonstrates the ability to configure and generate heterogeneous edge workloads for needs of the kind illustrated in the following picture:![Multi Module Deployment](./media/multimodulesetup.png) 
-As described in the picture above, while the 4 Edges are connected to the same IoT hub, each Edge has varying workloads and location specific information. 
+As described in the picture above, while the 4 Edge are connected to the same IoT hub, each Edge has varying workloads and location specific information. 
 <br>
 In IoT Edge, a workload is defined as a group of modules i.e. Docker containers and is deployed using a [deployment manifest](https://docs.microsoft.com/en-us/azure/iot-edge/module-composition). An IoT Edge deployment manifest consists of the following elements.
 * Module Definition
@@ -134,10 +134,9 @@ The sample implementation demonstrates the use of REST API and PowerApps as the 
 
 ## REST API Sample
 ![REST API Deployment](./media/restapiflow.png) 
-REST API accepts a JSON that defines the modules, desired properties and routes for each of the modules that constitutes the workload. The REST API is implemented in Azure Functions and it uses [Azure IoT Hub Service .NET SDK](https://github.com/Azure/azure-iot-sdk-csharp) to interact with Azure IoT Hub for deployment to IoT Edge. [CosmosDB](https://docs.microsoft.com/en-us/azure/cosmos-db/introduction) is used to store definition of Edges, Modules and Manifest, which is used by azure function to apply the appropriate configurations by location.
+REST API accepts a JSON document that defines the modules, desired properties and routes for each of the modules that constitutes the workload. The REST API is implemented in Azure Functions and it uses [Azure IoT Hub Service .NET SDK](https://github.com/Azure/azure-iot-sdk-csharp) to interact with Azure IoT Hub for deployment to IoT Edge. [CosmosDB](https://docs.microsoft.com/en-us/azure/cosmos-db/introduction) is used to store templates for Edge Manifest & Modules.
 
-Please read this document for configuring and deploying the Azure Function.
-
+Please read this [document](./documentation/restapi/restapi-sample.md) for configuring and deploying the Azure Function.
 
 
 ## PowerApps Sample
