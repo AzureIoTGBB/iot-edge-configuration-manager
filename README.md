@@ -140,9 +140,4 @@ Please read this [document](./documentation/restapi/restapi-sample.md) for confi
 
 
 ## PowerApps Sample
-![PowerApps Deployment](./media/powerappsflow.png) 
 
-<br>
-
-## REST API Sample
-![REST API Deployment](./media/restapiflow.png) 
