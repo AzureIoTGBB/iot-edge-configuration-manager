@@ -115,7 +115,7 @@ IoT Edge supports
 * [Layered Deployment](https://docs.microsoft.com/en-us/azure/iot-edge/module-deployment-monitoring?view=iotedge-2018-06#layered-deployment)
 
 <br>
-The goal of this project is to demonstrate how to do Single Device Deployment, but also give an example for how it can be used for deploying a fleet of devices:
+The goal of this project is to demonstrate how to do Single Device Deployment, but also give an example for how it can be used for deploying to a fleet of devices:
 
 <br>
 

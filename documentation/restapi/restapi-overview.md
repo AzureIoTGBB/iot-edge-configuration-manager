@@ -2,9 +2,10 @@
 
 **Table of contents**
 - [Overview](#solution-need)
-- [Deploying a Workload using the REST API](#solution-architecture)
-- [Understanding the sample data, calculations, and dashboard elements](#understanding-the-sample-data-calculations-and-dashboard-elements)
-- [Deploying the sample](#deploying-the-sample)
+- [Solution Architecture](#solution-architecture)
+- [Understanding the Solution](#understanding-the-solution)
+- [Deploying the Solution](#deploying-the-solution)
+- [Extending to support a Fleet of IoT Edge](#extending-to-fleet)
 
 ## Overview
 An IoTEdge deployment manifest is a JSON document that describes:
@@ -63,14 +64,14 @@ The solution consists of the following components:
 
 
 
-## Understanding the REST API
+## Understanding the Solution
 The REST API consists of the following Classes.
 
 * DeployToIoTEdge : This class forms the Azure Function with httpTrigger. Accepts as input a JSON document that represents {Modules, Desired Properties & Routes}. This function in turn createes supporting objects for the generation and depeloyment of IoT Edge Manifest
 * IoTEdgeConfigReader : A simple abstraction to read documents from CosmosDB. 
 * IoTEdgeCTL : The core class that generates the Manifest as per the request and applies the manifest to IoT Edge.
 
-## Deploying the sample
+## Deploying the Solution
 * CosmosDB
   - Create a CosmosDB Account
   - Create a CosmosDB Database
@@ -205,4 +206,56 @@ The REST API consists of the following Classes.
 ]
 ```
 
+## Extending to support a Fleet of IoT Edge
+An approach that can be taken into consideration for deploying to a fleet of IoTEdge is by extending the current REST API sample using reliable messaging services such as [Azure Service Bus](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-messaging-overview).
 
+The approach is as described in this diagram:
+![Fleet Flow](../../media/IoTEdgeFleetflow.png)
+Essentially a selector function (DeployToFleet) that builds the list of IoTEdge to be targeted for deployment. The idea is to build a JSON document that includes the Edge and the Modules, Desired Properties and Routes for each IoT Edge. This document will form the message stored in Azure Service Bus for a downstream Azure Function Service Bus Trigger to process the message and conduct the deployment.  
+
+```json
+{
+  "IoTedgeName": "NUC",
+  "mdpr":
+      [
+        {
+          "ModuleInstanceName": "CameraA",
+          "Module": "lvaEdge",
+          "DesiredProperties": "{\"applicationDataDirectory\": \"/var/lib/azuremediaservices\",\"azureMediaServicesArmId\": \"/subscriptions/XXXXXXXX-d417-4791-b2a9-XXXXXXXXXXXX/resourceGroups/lva-resources/providers/microsoft.media/mediaservices/lva\",\"aadTenantId\": \"XXXXXXXX-86f1-41af-91ab-XXXXXXXXXXXX\",\"aadServicePrincipalAppId\": \"XXXXXXXX-9ebd-4e16-a1f3-XXXXXXXXXXXX\",\"aadServicePrincipalSecret\": \"XXXXXXXX-fb0e-4dac-b49a-XXXXXXXXXXXX\",\"aadEndpoint\": \"https://login.microsoftonline.com\",\"aadResourceId\": \"https://management.core.windows.net/\",\"armEndpoint\": \"https://management.azure.com/\",\"diagnosticsEventsOutputName\": \"AmsDiagnostics\",\"operationalEventsOutputName\": \"AmsOperational\",\"logLevel\": \"Information\",\"logCategories\": \"Application,Events\",\"allowUnsecuredEndpoints\": true,\"telemetryOptOut\": false}",
+          "Routes": [
+            {
+              "RouteInstanceName": "CameraAtoIoTHub",
+              "FromModule": "CameraA",
+              "ToModule": null,
+              "FromChannel": "*",
+              "ToChannel": null,
+              "ToIoThub": true
+            },
+            {
+              "RouteInstanceName": "CameraAtoCustomVision",
+              "FromModule": "CameraA",
+              "ToModule": "CustomVision",
+              "FromChannel": "*",
+              "ToChannel": "tempin",
+              "ToIoThub": false
+            }
+          ]
+        },
+        {
+          "ModuleInstanceName": "TempSensor2",
+          "Module": "SimulatedTemperatureSensor",
+          "DesiredProperties": "{\"name\":\"pysender\"}",
+          "Routes": [
+            {
+              "RouteInstanceName": "PySenderToIoThub",
+              "FromModule": "TempSensor2",
+              "ToModule": null,
+              "FromChannel": "triggerout",
+              "ToChannel": null,
+              "ToIoThub": true
+            }
+          ]
+        }
+      ]
+}
+```
