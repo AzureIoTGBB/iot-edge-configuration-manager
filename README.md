@@ -60,7 +60,6 @@ The solution consists of the following components:
 
 2. A single Azure Functions Project with an HttpTrigger Function developed using .NET
 
-![Diagram showing the rest api architecture](./media/restapiflow.png)
 
 
 ## Understanding the Solution
