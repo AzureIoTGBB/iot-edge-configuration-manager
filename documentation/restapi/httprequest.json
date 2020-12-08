@@ -1,40 +1,55 @@
 [
-    {
-      "ModuleInstanceName": "CameraA",
-      "Module": "lvaEdge",
-      "DesiredProperties": "{\"applicationDataDirectory\": \"/var/lib/azuremediaservices\",\"azureMediaServicesArmId\": \"/subscriptions/XXXXXXXX-d417-4791-b2a9-XXXXXXXXXXXX/resourceGroups/lva-resources/providers/microsoft.media/mediaservices/lva\",\"aadTenantId\": \"XXXXXXXX-86f1-41af-91ab-XXXXXXXXXXXX\",\"aadServicePrincipalAppId\": \"XXXXXXXX-9ebd-4e16-a1f3-XXXXXXXXXXXX\",\"aadServicePrincipalSecret\": \"XXXXXXXX-fb0e-4dac-b49a-XXXXXXXXXXXX\",\"aadEndpoint\": \"https://login.microsoftonline.com\",\"aadResourceId\": \"https://management.core.windows.net/\",\"armEndpoint\": \"https://management.azure.com/\",\"diagnosticsEventsOutputName\": \"AmsDiagnostics\",\"operationalEventsOutputName\": \"AmsOperational\",\"logLevel\": \"Information\",\"logCategories\": \"Application,Events\",\"allowUnsecuredEndpoints\": true,\"telemetryOptOut\": false}",
-      "Routes": [
-        {
-          "RouteInstanceName": "CameraAtoIoTHub",
-          "FromModule": "CameraA",
-          "ToModule": null,
-          "FromChannel": "*",
-          "ToChannel": null,
-          "ToIoThub": true
-        },
-        {
-          "RouteInstanceName": "CameraAtoCustomVision",
-          "FromModule": "CameraA",
-          "ToModule": "CustomVision",
-          "FromChannel": "*",
-          "ToChannel": "tempin",
-          "ToIoThub": false
-        }
-      ]
-    },
-    {
-      "ModuleInstanceName": "TempSensor2",
-      "Module": "SimulatedTemperatureSensor",
-      "DesiredProperties": "{\"name\":\"pysender\"}",
-      "Routes": [
-        {
-          "RouteInstanceName": "PySenderToIoThub",
-          "FromModule": "TempSensor2",
-          "ToModule": null,
-          "FromChannel": "triggerout",
-          "ToChannel": null,
-          "ToIoThub": true
-        }
-      ]
-    }
-  ]
+  {
+    "ModuleInstanceName": "BackroomChiller",
+    "Module": "chiller",
+    "DesiredProperties": "{\"endPoint\": \"10.3.4.5\",\"armEndpoint\": \"https://chiller.azurewebsites.net/\",\"diagnosticsEventsOutputName\": \"chillerDiagnostics\",\"operationalEventsOutputName\": \"chillerOperational\",\"logLevel\": \"Information\",\"logCategories\": \"Application,Events\",\"telemetryOptOut\": false}",
+    "Routes": [
+      {
+        "RouteInstanceName": "BackroomChillerToTempAnalyzer",
+        "FromModule": "BackroomChiller",
+        "FromChannel": "tempreadings",
+        "ToModule": "TempAnalyzer",
+        "ToChannel": "chillertemp",
+        "ToIoThub": false
+      },
+      {
+        "RouteInstanceName": "BackroomChillerToIoTHub",
+        "FromModule": "BackroomChiller",
+        "FromChannel": "tempdiagnostics",
+        "ToModule": "",
+        "ToChannel": "",
+        "ToIoThub": true
+      }
+    ]
+  },
+  {
+    "ModuleInstanceName": "frontfreezer",
+    "Module": "freezer",
+    "DesiredProperties": "{\"endPoint\":\"10.3.4.6\"}",
+    "Routes": [
+      {
+        "RouteInstanceName": "frontfreezerToTempAnalyzer",
+        "FromModule": "frontfreezer",
+        "FromChannel": "tempreadings",
+        "ToModule": "TempAnalyzer",
+        "ToChannel": "freezertemp",
+        "ToIoThub": false
+      }
+    ]
+  },
+  {
+    "ModuleInstanceName": "tempAnalyzer",
+    "Module": "tempAnalyzer",
+    "DesiredProperties": "{\"chillerThreshold\":\"43\", \"freezerThreshold\":\"32\"}",
+    "Routes": [
+      {
+        "RouteInstanceName": "tempAnalyzerToIoTHub",
+        "FromModule": "tempanalyzer",
+        "FromChannel": "*",
+        "ToModule": "",
+        "ToChannel": "",
+        "ToIoThub": true
+      }
+    ]
+  }
+]
