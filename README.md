@@ -30,14 +30,14 @@ For more information, see the [Code of Conduct FAQ](https://opensource.microsoft
 
 ## Solution goals
 
-The idea for this solution stems from a customer need to deploy varying workloads to a fleet of IoT Edge at various locations (retail stores/factories/oil wells/etc.). Each IoT Edge has specific workloads it runs and is specific to the location.
+The idea for this solution stems from a customer need to deploy varying workloads to a fleet of IoT Edge at various locations (retail stores/factories/oil wells/etc.). Each IoT Edge runs workloads specific to the location.
 
-For example, consider a retail store with multiple IoT devices such as Chillers, Refrigerators, HVAC, Cameras, Safe and other devices. All of these devices are connected to IoT Edge. Each of these IoT devices has one or more modules in IoT Edge with location specific configurations such as IP address of the device, environment variables and desired properties. 
+For example, consider a retail store with multiple IoT devices such as Chillers, Refrigerators, HVAC, Cameras, Safe and other devices connected to IoT Edge. Each of these IoT devices has one or more modules in IoT Edge with location specific configurations such as IP address of the device, environment variables and desired properties. 
 
-As the number of locations increases and the variability in number of devices per location, such as numebr of camera, configuration for each camera (IP address, camera type, etc.), the management and deployment of the workloads will tend to get complex and does not readily fit into IoT edge [Automatic Deployment for single devices or at scale](https://docs.microsoft.com/en-us/azure/iot-edge/module-deployment-monitoring). Considering each IoT Edge is different and has variability in configurations by workload, a single deployment manifest for the entire fleet will not meet the needs of all Edges. 
+As the number of locations increases and the variability in number of devices per location, such as number of camera, configuration for each camera (IP address, camera type, etc.), the management and deployment of the workloads will tend to get complex and does not readily fit into IoT edge [Automatic Deployment for single devices or at scale](https://docs.microsoft.com/en-us/azure/iot-edge/module-deployment-monitoring). Considering each IoT Edge is different and has variability in configurations by workload, a single deployment manifest for the entire fleet will not meet the needs of all Edges. 
 
-This solution demonstrates the ability to generate heterogeneous edge workloads for needs of the kind illustrated in the following picture:![Multi Module Deployment](./media/multimodulesetup.png) 
-As described in the picture above, while the 4 Edge are connected to the same IoT hub, each Edge has varying workloads and location specific information. 
+This solution demonstrates the ability to configure heterogeneous edge workloads for needs of the kind illustrated in the following picture:![Multi Module Deployment](./media/multimodulesetup.png) 
+As described in the picture above, while each of the four IoT Edge is connected to the same IoT hub, each Edge has varying workloads and location specific information. 
 <br>
 <br>
 <br>
@@ -45,9 +45,7 @@ As described in the picture above, while the 4 Edge are connected to the same Io
 ## Solution architecture & components
 
 ![REST API Deployment](./media/restapiflow.png) 
-The solution is implemented as a REST API that accepts a JSON document that defines the modules, desired properties and routes [MDR] for each of the modules that constitutes the workload. The REST API is implemented in Azure Functions and it uses [Azure IoT Hub Service .NET SDK](https://github.com/Azure/azure-iot-sdk-csharp) to interact with Azure IoT Hub for deployment to IoT Edge. [CosmosDB](https://docs.microsoft.com/en-us/azure/cosmos-db/introduction) is used as the data store for Edge Manifest & Module definition.
-
-
+The solution is implemented as a REST API in Azure Functions, and accepts a JSON document that defines the modules, desired properties and routes [MDR] for each of the modules that constitutes the workload. The REST API uses [Azure IoT Hub Service .NET SDK](https://github.com/Azure/azure-iot-sdk-csharp) to interact with Azure IoT Hub for deployment to IoT Edge. [CosmosDB](https://docs.microsoft.com/en-us/azure/cosmos-db/introduction) is used as the data store for Edge Manifest & Module definition.
 
 ## Solution architecture
 
@@ -63,13 +61,13 @@ The solution consists of the following components:
 
 
 ## Understanding the Solution
-At the core, an IoT Edge Deployment Manifest consists of the following sections
+At the core, an IoT Edge Deployment is acomplished by submitting the configurations specified in an IoT Edge Manifest. The Manifest consists of the following sections
 1. Modules
 2. Desired Properties
 3. Routes
-This solution assembles these sections to generate an IoT Edge Manifest specific to the workload.
+This solution assembles these sections to generate an IoT Edge Manifest specific to the workload and deploy it to IoT Edge.
 
-Here is a example walk-thru of a solution.
+Here is an example walk-thru of a solution.
 
 Scenario:
 Consider a retail location with 
@@ -84,9 +82,9 @@ The workload comprises of the following 3 IoT Edge Modules (docker containers) n
 2. Freezer (acrcontainers.azurecr.io/freezer:v2)
 3. Temp Analyzer (acrcontainers.azurecr.io/tempanalyzer:v1)
 
-Each of these modules has a set of Desired Properties and Routes that define the workload configuration on IoTEdge.
+Each of these Modules has a set of Desired Properties and Routes that define the workload configuration on IoTEdge.
 
-The input to REST API to generate IoT Edge manifest will be as follows:
+The input to REST API to generate IoT Edge manifest for this workload will be as follows:
 
 ```json
 [
@@ -145,13 +143,13 @@ The input to REST API to generate IoT Edge manifest will be as follows:
   }
 ]
 ```
-As you can see in this workload definition, there is workload specific configuration applied as desired properties. Imagine having a core configuration management database across the organization that houses all the location specific information that can be applied at the time of IoT Edge manifest generation, thereby supporting the need for location specific configurations in IoT Edge Manifest.
+As you can see in this workload definition, there is workload specific configuration applied as desired properties. Imagine having a core configuration management database across the organization that houses all the location specific information that can be applied at the time of IoT Edge manifest generation, thereby supporting the need for location specific configurations for IoT Edge workloads.
 
-The REST API depends on a base manifest template and module definition to be stored in CosmosDB to generate the final IoT Edge manifest.
+The REST API depends on CosmosDB for base manifest template and module definition, however the data store can be changed to alternate teechnologies as appropriate.
 
 
 ### Manifest Template
-The manifest template is a placeholder that defines the structure of IoT Edge manifest and is already populated with edgeAgent and edgeHub information. A sample of the manifest is as defined [here](./restapi/manifest.json). 
+The manifest template is a placeholder that defines the structure of IoT Edge manifest and is populated with edgeAgent and edgeHub information. A sample of the manifest template is as defined [here](./documentation/restapi/manifest.json). 
 
 
 ### Modules Definition
@@ -170,10 +168,11 @@ Modules define the docker container and its create options. Building on the exam
     }
 }
 ```
-In CosmosDB a list of these module definitions are stored as JSON documents that can be queried based on name, in this case, "chilleer". Imagine a list of modules across the Enterprise stored in CosmosDB as the library of modules from which an operator can choose to deploy the various modules required for the workload. 
+In CosmosDB a list of these module definitions are stored as JSON documents that can be queried based on name, in this case, "chilleer". Imagine a list of modules across the Enterprise stored in CosmosDB as the library of modules from which an Edge operator can choose to deploy the various modules required for the workload. 
 While in this case the module definitions are static, one can implement a task as part of the CI/CD process for IoT Edge modules to update the CosmosDB document with the latest version of the docker container for each of the modules, thereby when the next time IoT edge deployment happens, the latest version of the docker containers is applied.
 
-The REST API is currently implemented as a HTTP Trigger, however it can be updated to support Azure Service Bus as the input trigger for fleet deployment.
+
+The REST API is currently implemented as a HTTP Trigger, however it can be using reliable messaging services such as [Azure Service Bus](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-messaging-overview) as the input trigger for fleet deployment as described in this image.
 ![Fleet Flow](./media/IoTEdgeFleetflow.png)
 
 ## Deploying the Solution
@@ -311,59 +310,7 @@ The REST API is currently implemented as a HTTP Trigger, however it can be updat
 ]
 ```
 
-## Extending to support a Fleet of IoT Edge
-An approach that can be taken into consideration for deploying to a fleet of IoTEdge is by extending the current REST API sample using reliable messaging services such as [Azure Service Bus](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-messaging-overview).
 
-The approach is as described in this diagram:
-![Fleet Flow](../../media/IoTEdgeFleetflow.png)
-Essentially a selector function (DeployToFleet) that builds the list of IoTEdge to be targeted for deployment. The idea is to build a JSON document that includes the Edge and the Modules, Desired Properties and Routes for each IoT Edge. This document will form the message stored in Azure Service Bus for a downstream Azure Function Service Bus Trigger to process the message and conduct the deployment.  
-
-```json
-{
-  "IoTedgeName": "NUC",
-  "mdpr":
-      [
-        {
-          "ModuleInstanceName": "CameraA",
-          "Module": "lvaEdge",
-          "DesiredProperties": "{\"applicationDataDirectory\": \"/var/lib/azuremediaservices\",\"azureMediaServicesArmId\": \"/subscriptions/XXXXXXXX-d417-4791-b2a9-XXXXXXXXXXXX/resourceGroups/lva-resources/providers/microsoft.media/mediaservices/lva\",\"aadTenantId\": \"XXXXXXXX-86f1-41af-91ab-XXXXXXXXXXXX\",\"aadServicePrincipalAppId\": \"XXXXXXXX-9ebd-4e16-a1f3-XXXXXXXXXXXX\",\"aadServicePrincipalSecret\": \"XXXXXXXX-fb0e-4dac-b49a-XXXXXXXXXXXX\",\"aadEndpoint\": \"https://login.microsoftonline.com\",\"aadResourceId\": \"https://management.core.windows.net/\",\"armEndpoint\": \"https://management.azure.com/\",\"diagnosticsEventsOutputName\": \"AmsDiagnostics\",\"operationalEventsOutputName\": \"AmsOperational\",\"logLevel\": \"Information\",\"logCategories\": \"Application,Events\",\"allowUnsecuredEndpoints\": true,\"telemetryOptOut\": false}",
-          "Routes": [
-            {
-              "RouteInstanceName": "CameraAtoIoTHub",
-              "FromModule": "CameraA",
-              "ToModule": null,
-              "FromChannel": "*",
-              "ToChannel": null,
-              "ToIoThub": true
-            },
-            {
-              "RouteInstanceName": "CameraAtoCustomVision",
-              "FromModule": "CameraA",
-              "ToModule": "CustomVision",
-              "FromChannel": "*",
-              "ToChannel": "tempin",
-              "ToIoThub": false
-            }
-          ]
-        },
-        {
-          "ModuleInstanceName": "TempSensor2",
-          "Module": "SimulatedTemperatureSensor",
-          "DesiredProperties": "{\"name\":\"pysender\"}",
-          "Routes": [
-            {
-              "RouteInstanceName": "PySenderToIoThub",
-              "FromModule": "TempSensor2",
-              "ToModule": null,
-              "FromChannel": "triggerout",
-              "ToChannel": null,
-              "ToIoThub": true
-            }
-          ]
-        }
-      ]
-}
-```
 
 
 ## PowerApps Sample

@@ -83,8 +83,9 @@ namespace IotEdgeConfigurationManager.Manifest
                 string routeFrom="", routeTo="", routes="";
                 foreach (ModuleDesiredPropertiesRoutes instanceMDPR in requestMDPR)
                 {
-                    //Form the Routes
-                    foreach(ModuleRoute r in instanceMDPR.Routes) 
+                    if (instanceMDPR.Routes != null)
+                        //Form the Routes
+                        foreach(ModuleRoute r in instanceMDPR.Routes) 
                     {
                         routeFrom = String.Format("\"{0}\":\"FROM /messages/modules/{1}/outputs/{2}",r.RouteInstanceName, r.FromModule, r.FromChannel);
                         if (r.ToIoThub) {
