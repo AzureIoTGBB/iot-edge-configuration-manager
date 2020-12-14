@@ -3,7 +3,7 @@ readme.md
 
 This project provides an approach to configure workloads on a fleet of IoT Edge. A workload is one or more Docker containers running as IoT Edge Modules.
 
-The goal is to provide both guidance as well as a sample implementation to enable Workloads that run on IoT Edge.
+The goal is to provide both guidance as well as a sample implementation for deploying workloads to IoT Edge.
 
 <br>
 
@@ -38,6 +38,8 @@ As the number of locations increases and the variability in number of devices pe
 
 This solution demonstrates the ability to configure heterogeneous edge workloads for needs of the kind illustrated in the following picture:![Multi Module Deployment](./media/multimodulesetup.png) 
 As described in the picture above, while each of the four IoT Edge is connected to the same IoT hub, each Edge has varying workloads and location specific information. 
+
+This solution uses a configuration store to apply the appropriate location specific configuration and generates an IoT Edge manifest for each of the workload and keep it specific to the location.
 <br>
 <br>
 <br>
@@ -47,25 +49,24 @@ As described in the picture above, while each of the four IoT Edge is connected 
 ![REST API Deployment](./media/restapiflow.png) 
 The solution is implemented as a REST API in Azure Functions, and accepts a JSON document that defines the modules, desired properties and routes [MDR] for each of the modules that constitutes the workload. The REST API uses [Azure IoT Hub Service .NET SDK](https://github.com/Azure/azure-iot-sdk-csharp) to interact with Azure IoT Hub for deployment to IoT Edge. [CosmosDB](https://docs.microsoft.com/en-us/azure/cosmos-db/introduction) is used as the data store for Edge Manifest & Module definition.
 
+The REST API is the backend interface that can be fronted with any type of UX. In this repo we have a sample PowerApps App as the UX interface to define modules, desired properties and Routes [MDR].
+![PowerApps Sample](./media/powerappsflow.png) 
+
 ## Solution architecture
 
 The solution consists of the following components:
 
-1. CosmosDB Database with 2 collections\containers
-  - manifest - a single document that defines the template for IoT Edge Manifest. The [manifest](./restapi/manifest.json) is a template with definitions for edgeAgent and edgeHub, and the rest of the manifest is not populated. In this example there is only a single manifest temeplate file, however the solution can be extended to support multiple manifest templates versions depending on the need.
-
-  - allmodules - a list of modules that are available for deployment as a workload. The [module definition](./module.json) includes the version of docker container and container create options. This can be further extended to support instance specific container create options.
-
-2. A single Azure Functions Project with an HttpTrigger Function developed using .NET
-
-
+1. CosmosDB Database as the configuraton store
+2. Azure Functions for hosting REST API
+3. PowerApps as a sample UX
 
 ## Understanding the Solution
-At the core, an IoT Edge Deployment is acomplished by submitting the configurations specified in an IoT Edge Manifest. The Manifest consists of the following sections
+At the core, an IoT Edge workload is represented as an IoT Edge manifest. The Manifest includes the following sections
 1. Modules
 2. Desired Properties
 3. Routes
-This solution assembles these sections to generate an IoT Edge Manifest specific to the workload and deploy it to IoT Edge.
+
+This solution assembles the sections to generate an IoT Edge Manifest specific to the workload and deploy it to IoT Edge.
 
 Here is an example walk-thru of a solution.
 
@@ -145,172 +146,8 @@ The input to REST API to generate IoT Edge manifest for this workload will be as
 ```
 As you can see in this workload definition, there is workload specific configuration applied as desired properties. Imagine having a core configuration management database across the organization that houses all the location specific information that can be applied at the time of IoT Edge manifest generation, thereby supporting the need for location specific configurations for IoT Edge workloads.
 
-The REST API depends on CosmosDB for base manifest template and module definition, however the data store can be changed to alternate teechnologies as appropriate.
-
-
-### Manifest Template
-The manifest template is a placeholder that defines the structure of IoT Edge manifest and is populated with edgeAgent and edgeHub information. A sample of the manifest template is as defined [here](./documentation/restapi/manifest.json). 
-
-
-### Modules Definition
-Modules define the docker container and its create options. Building on the example here is a definition for Chiller module :
-```json
-{
-    "chiller": {
-        "version": "1.0",
-        "type": "docker",
-        "status": "running",
-        "restartPolicy": "always",
-        "settings": {
-            "image": "yourcontainerregistry.azurecr.io/chiller:1",
-            "createOptions": "{\"HostConfig\":{\"LogConfig\":{\"Type\":\"\",\"Config\":{\"max-size\":\"10m\",\"max-file\":\"10\"}},\"Binds\":[\"/Users/jaypaddy/chiller/output:/var/output/\",\"/Users/jaypaddy/chiller/input:/var/input/\"]}}"
-        }
-    }
-}
-```
-In CosmosDB a list of these module definitions are stored as JSON documents that can be queried based on name, in this case, "chilleer". Imagine a list of modules across the Enterprise stored in CosmosDB as the library of modules from which an Edge operator can choose to deploy the various modules required for the workload. 
-While in this case the module definitions are static, one can implement a task as part of the CI/CD process for IoT Edge modules to update the CosmosDB document with the latest version of the docker container for each of the modules, thereby when the next time IoT edge deployment happens, the latest version of the docker containers is applied.
-
-
-The REST API is currently implemented as a HTTP Trigger, however it can be using reliable messaging services such as [Azure Service Bus](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-messaging-overview) as the input trigger for fleet deployment as described in this image.
-![Fleet Flow](./media/IoTEdgeFleetflow.png)
 
 ## Deploying the Solution
-* CosmosDB
-  - Create a CosmosDB Account
-  - Create a CosmosDB Database
-  - Create a CosmosDB collection named "manifest" with partitionkey : /version
-  - Create a CosmosDB collection named "allmodules" with partitionkey : /moduleid 
-  - Add an item to "manifest" collection in CosmosDB with 2 elements "version" and "modulesContent" 
-  ```json
-      "version": "1.0",
-      "modulesContent": {
-          "$edgeAgent": {
-              "properties.desired": {
-                  "schemaVersion": "1.0",
-                  "runtime": {
-                      "type": "docker",
-                      "settings": {
-                          "minDockerVersion": "v1.25",
-                          "loggingOptions": "",
-                          "registryCredentials": {
-                              "default": {
-                                  "username": "{$ACRUSER}",
-                                  "password": "{$ACRPASSWORD}",
-                                  "address": "{$ACR}"
-                              }
-                          }
-                      }
-                  },
-                  "systemModules": {
-                      "edgeAgent": {
-                          "type": "docker",
-                          "settings": {
-                              "image": "mcr.microsoft.com/azureiotedge-agent:1.0.10",
-                              "createOptions": "{}"
-                          }
-                      },
-                      "edgeHub": {
-                          "type": "docker",
-                          "status": "running",
-                          "restartPolicy": "always",
-                          "settings": {
-                              "image": "mcr.microsoft.com/azureiotedge-hub:1.0.10",
-                              "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"5671/tcp\":[{\"HostPort\":\"5671\"}],\"8883/tcp\":[{\"HostPort\":\"8883\"}],\"443/tcp\":[{\"HostPort\":\"443\"}]}}}"
-                          }
-                      }
-                  },
-                  "modules": {}
-              }
-          },
-          "$edgeHub": {
-              "properties.desired": {
-                  "schemaVersion": "1.0",
-                  "routes": {},
-                  "storeAndForwardConfiguration": {
-                      "timeToLiveSecs": 7200
-                  }
-              }
-          }
-      }
-  ```
-  - Add items to "allmodules" collection in CosmosDB with 2 elements "moduleid" and definition of the module
-  ```json
-      "moduleid": "lvaEdge",
-      "lvaEdge": {
-          "version": "1.0",
-          "type": "docker",
-          "status": "running",
-          "restartPolicy": "always",
-          "settings": {
-              "image": "mcr.microsoft.com/media/live-video-analytics:1",
-              "createOptions": "{\"HostConfig\":{\"LogConfig\":{\"Type\":\"\",\"Config\":{\"max-size\":\"10m\",\"max-file\":\"10\"}},\"Binds\":[\"/Users/jaypaddy/lva/lvaadmin/samples/output:/var/media/\",\"/Users/jaypaddy/lva/local/mediaservices:/var/lib/azuremediaservices/\"]}}"
-          }
-      }
-  ``` 
-
-* Azure Function
-  - Create a Resource Group
-  - Deploy Azure Function DeployToIoTEdge 
-  - Update Application Settings with appropriate environment variables as defined in local.settings.json
-    - "AzureWebJobsStorage": "<CONNECTION STRING>"
-    - "IOTHUB_CONN_STRING_CSHARP": "<IOT HUB SERVICE CONNECTIONSTRING>"
-    - "ACRUSER": "<AZURE CONTAINER REGISTRY USER NAME>"
-    - "ACRPASSWORD": "<AZURE CONTAINER REGISTRY PASSWORD>"
-    - "ACR": "<AZURE CONTAINER REGISTRY SERVER>"
-    - "COSMOSENDPOINT": "<COSMOSDB ACCOUNT URI>"
-    - "COSMOSKEY": "<COSMOSDB ACCOUNT KEY>"
-    - "COSMOSDATABASEID": "<COSMOSDB DATABASE NAME>"
-    - "COSMOSCONTAINER_ALLMODULES": "<COSMOSDB ALLMODULES COLLECTION NAME>"
-    - "COSMOSCONTAINER_MANIFEST": "<COSMOSDB MANIFEST COLLECTION NAME>"
-
-
-
-* Sample Request to Azure Function HTTPTrigger (please replace with your modules as mentioned in CosmosDB collection)
-```json
-[
-  {
-    "ModuleInstanceName": "CameraA",
-    "Module": "lvaEdge",
-    "DesiredProperties": "{\"applicationDataDirectory\": \"/var/lib/azuremediaservices\",\"azureMediaServicesArmId\": \"/subscriptions/XXXXXXXX-d417-4791-b2a9-XXXXXXXXXXXX/resourceGroups/lva-resources/providers/microsoft.media/mediaservices/lva\",\"aadTenantId\": \"XXXXXXXX-86f1-41af-91ab-XXXXXXXXXXXX\",\"aadServicePrincipalAppId\": \"XXXXXXXX-9ebd-4e16-a1f3-XXXXXXXXXXXX\",\"aadServicePrincipalSecret\": \"XXXXXXXX-fb0e-4dac-b49a-XXXXXXXXXXXX\",\"aadEndpoint\": \"https://login.microsoftonline.com\",\"aadResourceId\": \"https://management.core.windows.net/\",\"armEndpoint\": \"https://management.azure.com/\",\"diagnosticsEventsOutputName\": \"AmsDiagnostics\",\"operationalEventsOutputName\": \"AmsOperational\",\"logLevel\": \"Information\",\"logCategories\": \"Application,Events\",\"allowUnsecuredEndpoints\": true,\"telemetryOptOut\": false}",
-    "Routes": [
-      {
-        "RouteInstanceName": "CameraAtoIoTHub",
-        "FromModule": "CameraA",
-        "ToModule": null,
-        "FromChannel": "*",
-        "ToChannel": null,
-        "ToIoThub": true
-      },
-      {
-        "RouteInstanceName": "CameraAtoCustomVision",
-        "FromModule": "CameraA",
-        "ToModule": "CustomVision",
-        "FromChannel": "*",
-        "ToChannel": "tempin",
-        "ToIoThub": false
-      }
-    ]
-  },
-  {
-    "ModuleInstanceName": "TempSensor2",
-    "Module": "SimulatedTemperatureSensor",
-    "DesiredProperties": "{\"name\":\"pysender\"}",
-    "Routes": [
-      {
-        "RouteInstanceName": "PySenderToIoThub",
-        "FromModule": "TempSensor2",
-        "ToModule": null,
-        "FromChannel": "triggerout",
-        "ToChannel": null,
-        "ToIoThub": true
-      }
-    ]
-  }
-]
-```
-
-
 
 
 ## PowerApps Sample

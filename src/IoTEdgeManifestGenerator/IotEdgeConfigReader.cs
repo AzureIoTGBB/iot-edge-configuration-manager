@@ -19,21 +19,21 @@ namespace IotEdgeConfigurationManager.Manifest
     {
         private CosmosClient _cosmosClient;
         private Database _cosmosDatabase;
-        private string _databaseName;
+        private string _accountName;
         private string _templateColl, _moduleColl;
 
-        public static IotEdgeConfigReader CreateWithCosmosDBConn(CosmosClient cosmosClient, string databaseName, string templateColl, string moduleColl){
+        public static IotEdgeConfigReader CreateWithCosmosDBConn(CosmosClient cosmosClient, string accountName, string templateColl, string moduleColl){
             //Need Error Handling
             IotEdgeConfigReader configReader = new IotEdgeConfigReader();
             configReader._cosmosClient = cosmosClient;
-            configReader._databaseName = databaseName;
-            configReader._cosmosDatabase = cosmosClient.GetDatabase(databaseName);
+            configReader._accountName = accountName;
+            configReader._cosmosDatabase = cosmosClient.GetDatabase(accountName);
             configReader._templateColl = templateColl;
             configReader._moduleColl = moduleColl;
             return  configReader;
         }
         public  async Task<string> GetIoTEdgeTemplate(){
-            Container cosmosCollection = _cosmosClient.GetContainer(_databaseName,_templateColl);
+            Container cosmosCollection = _cosmosClient.GetContainer(_accountName,_templateColl);
             QueryDefinition query = new QueryDefinition($" SELECT e.modulesContent FROM manifest e");
             FeedIterator<Object> resultSetIterator = cosmosCollection.GetItemQueryIterator<Object>(query);
             {
@@ -52,7 +52,7 @@ namespace IotEdgeConfigurationManager.Manifest
             return "";
         }
         public async Task<IDictionary<string,object>> GetModuleConfig(string moduleId){
-            Container cosmosCollection = _cosmosClient.GetContainer(_databaseName,_moduleColl);
+            Container cosmosCollection = _cosmosClient.GetContainer(_accountName,_moduleColl);
             QueryDefinition query = new QueryDefinition($" SELECT e.{moduleId} FROM allmodules e WHERE e.moduleid = @moduleId ")
                 .WithParameter("@moduleId", moduleId);
             IDictionary<string, object> moduleConfigObjList = new Dictionary<string, object>();
@@ -75,6 +75,10 @@ namespace IotEdgeConfigurationManager.Manifest
 
         }
     
+        
+
+
+
     }
 
 

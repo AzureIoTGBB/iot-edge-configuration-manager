@@ -4,5 +4,6 @@
     "azureFunctions.projectRuntime": "~3",
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.preDeployTask": "publish",
-    "azureFunctions.projectSubpath": "src/IoTEdgeManifestGenerator"
+    "azureFunctions.projectSubpath": "src/IoTEdgeManifestGenerator",
+    "azureFunctions.templateFilter": "All"
 }

@@ -1,0 +1,14 @@
+{
+    "id": "100",
+    "moduleid": "SimulatedTemperatureSensor",
+    "SimulatedTemperatureSensor": {
+        "version": "1.0",
+        "type": "docker",
+        "status": "running",
+        "restartPolicy": "always",
+        "settings": {
+            "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0",
+            "createOptions": "{}"
+        }
+    }
+}

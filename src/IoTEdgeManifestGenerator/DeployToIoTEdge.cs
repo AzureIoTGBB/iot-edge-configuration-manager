@@ -79,7 +79,7 @@ namespace IotEdgeConfigurationManager.Manifest
 
             string s_cosmosendpoint = Environment.GetEnvironmentVariable("COSMOSENDPOINT");
             string s_cosmoskey = Environment.GetEnvironmentVariable("COSMOSKEY");
-            string s_cosmosDatabaseId = Environment.GetEnvironmentVariable("COSMOSDATABASEID");
+            string s_cosmosAccountName = Environment.GetEnvironmentVariable("COSMOSACCOUNTNAME");
 
             //Connect to IoTHub
             _registryManager = RegistryManager.CreateFromConnectionString(s_connectionString);
@@ -87,12 +87,12 @@ namespace IotEdgeConfigurationManager.Manifest
             _cosmosClient = new CosmosClient(s_cosmosendpoint, s_cosmoskey);
 
             IotEdgeConfigReader cosmosDBConfigReader = IotEdgeConfigReader.CreateWithCosmosDBConn(_cosmosClient,
-                                        s_cosmosDatabaseId,
+                                        s_cosmosAccountName,
                                         Environment.GetEnvironmentVariable("COSMOSCONTAINER_MANIFEST"),
                                         Environment.GetEnvironmentVariable("COSMOSCONTAINER_ALLMODULES"));
             string iotEdgeTemplateJSON = await cosmosDBConfigReader.GetIoTEdgeTemplate();
-            //Replace {$ACRUSER} {$ACRPASSWORD} {$ACR}
-            iotEdgeTemplateJSON = iotEdgeTemplateJSON.Replace("{$ACRUSER}",s_acruser).Replace("{$ACRPASSWORD}",s_acrpassword).Replace("{$ACR}",s_acr);
+            //Replace $ACRUSER $ACRPASSWORD $ACR
+            iotEdgeTemplateJSON = iotEdgeTemplateJSON.Replace("$ACRUSER",s_acruser).Replace("$ACRPASSWORD",s_acrpassword).Replace("$ACR",s_acr);
             
             
             IoTEdgeCTL iotedgeCTL = new IoTEdgeCTL(_registryManager, cosmosDBConfigReader);
