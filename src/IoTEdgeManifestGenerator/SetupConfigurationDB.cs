@@ -29,10 +29,11 @@ namespace IoTEdgeConfigurationManager.Manifest
                 body : json
             */
 
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("SetupConfigurationDB Triggered.");
             string collName = req.Query["coll"];
             if (string.IsNullOrEmpty(collName))
                 return new BadRequestObjectResult("Missing coll in request");
+            log.LogInformation($"coll={collName}");
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             if (string.IsNullOrEmpty(requestBody))
@@ -51,12 +52,14 @@ namespace IoTEdgeConfigurationManager.Manifest
 
 
             CosmosClient cosmosClient;
+            Database cosmosDatabase;
             string templateColl, moduleColl;
-            string cosmosaccountname, cosmosendpoint, cosmoskey;
+            string cosmosaccountname, cosmosdatabasename, cosmosendpoint, cosmoskey;
 
             cosmosaccountname = Environment.GetEnvironmentVariable("COSMOSACCOUNTNAME");
             cosmosendpoint = Environment.GetEnvironmentVariable("COSMOSENDPOINT");
             cosmoskey = Environment.GetEnvironmentVariable("COSMOSKEY");
+            cosmosdatabasename = Environment.GetEnvironmentVariable("COSMOSDBNAME");
             templateColl = Environment.GetEnvironmentVariable("COSMOSCONTAINER_MANIFEST");
             moduleColl  = Environment.GetEnvironmentVariable("COSMOSCONTAINER_ALLMODULES");
 
@@ -67,25 +70,27 @@ namespace IoTEdgeConfigurationManager.Manifest
             if (string.IsNullOrEmpty(cosmoskey))
                 return new BadRequestObjectResult("Missing cosmoskey in environment");
 
+
+
             try{
                 cosmosClient = new CosmosClient(cosmosendpoint, cosmoskey);
+                cosmosDatabase = cosmosClient.GetDatabase(cosmosdatabasename);
                 Container cosmosCollection;
                 ItemResponse<Object> item;
                 Object requestBodyObj = JsonConvert.DeserializeObject<Object>(requestBody);
                 if ( collName == "man") {
-                    cosmosCollection = cosmosClient.GetContainer(cosmosaccountname,templateColl);   
+                    cosmosCollection = cosmosDatabase.GetContainer(templateColl);   
                 }
                 else if (collName == "mod" ) {
-                    cosmosCollection = cosmosClient.GetContainer(cosmosaccountname,moduleColl);   
-
+                    cosmosCollection = cosmosDatabase.GetContainer(moduleColl);   
                 }
                 else {
                     return new BadRequestObjectResult("Invalid coll in request"); 
                 }
-                item = await cosmosCollection.CreateItemAsync(requestBodyObj);  
+                item = await cosmosCollection.UpsertItemAsync(requestBodyObj);  
                 string responseMessage;
                 if ( item.StatusCode == HttpStatusCode.Created ){
-                    responseMessage =  $"Hello, Caller. This HTTP triggered function executed successfully for {collName}";
+                    responseMessage =  $"Hello, Caller. Document inserted into {collName}";
                     return new OkObjectResult(responseMessage);
                 }
                 else {
@@ -96,6 +101,7 @@ namespace IoTEdgeConfigurationManager.Manifest
             catch (Exception e)
             {
                 Console.WriteLine($"{e}");
+                log.LogError($"{e}");
                 return new BadRequestObjectResult($"{e}");
             }
         }

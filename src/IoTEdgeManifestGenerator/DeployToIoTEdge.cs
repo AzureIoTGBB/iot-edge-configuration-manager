@@ -26,7 +26,7 @@ namespace IotEdgeConfigurationManager.Manifest
         {
             _log = log;
         }
-        [FunctionName("GenerateIoTEdgeManifest")]
+        [FunctionName("GenerateApplyIoTEdgeManifest")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req)
         {
@@ -88,6 +88,7 @@ namespace IotEdgeConfigurationManager.Manifest
 
             IotEdgeConfigReader cosmosDBConfigReader = IotEdgeConfigReader.CreateWithCosmosDBConn(_cosmosClient,
                                         s_cosmosAccountName,
+                                        Environment.GetEnvironmentVariable("COSMOSDBNAME"),
                                         Environment.GetEnvironmentVariable("COSMOSCONTAINER_MANIFEST"),
                                         Environment.GetEnvironmentVariable("COSMOSCONTAINER_ALLMODULES"));
             string iotEdgeTemplateJSON = await cosmosDBConfigReader.GetIoTEdgeTemplate();

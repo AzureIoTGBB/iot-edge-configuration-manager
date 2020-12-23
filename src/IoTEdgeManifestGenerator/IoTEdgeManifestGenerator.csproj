@@ -7,7 +7,7 @@
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="4.1.1" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.7" />
     <PackageReference Include="Microsoft.Azure.Devices" Version="1.20.0" />
-    <PackageReference Include="Microsoft.Azure.Cosmos" Version="*" />  </ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.15.1" />  </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -85,6 +85,9 @@ The workload comprises of the following 3 IoT Edge Modules (docker containers) n
 
 Each of these Modules has a set of Desired Properties and Routes that define the workload configuration on IoTEdge.
 
+
+
+
 The input to REST API to generate IoT Edge manifest for this workload will be as follows:
 
 ```json
@@ -144,7 +147,16 @@ The input to REST API to generate IoT Edge manifest for this workload will be as
   }
 ]
 ```
+
 As you can see in this workload definition, there is workload specific configuration applied as desired properties. Imagine having a core configuration management database across the organization that houses all the location specific information that can be applied at the time of IoT Edge manifest generation, thereby supporting the need for location specific configurations for IoT Edge workloads.
+
+
+
+
+<
+Talk about the PowerApp Interface that generates the MDR JSON....
+>
+
 
 
 ## Deploying the Solution
