@@ -156,7 +156,7 @@ As an example in this repository we have put together a sample PowerApp that ass
 
 ## Deploying the Solution
 The solution is deployed in 2 parts
-1. REST API - An installation bash script [setup.sh](s./Install/setup.sh) creates all the resources required for depeloying Azure services frequired for the solution. The Azure resources created include
+1. REST API - An installation bash script [setup.sh](./Install/setup.sh) creates all the resources required for depeloying Azure services frequired for the solution. The Azure resources created include
     - Resource Group
     - Function App 
     - CosmosDB Account, Database and Containers
