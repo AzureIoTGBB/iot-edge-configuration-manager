@@ -85,10 +85,7 @@ The workload comprises of the following 3 IoT Edge Modules (docker containers) n
 
 Each of these Modules has a set of Desired Properties and Routes that define the workload configuration on IoTEdge.
 
-
-
-
-The input to REST API to generate IoT Edge manifest for this workload will be as follows:
+The input to REST API to generate IoT Edge manifest for this workload is as follows:
 
 ```json
 [
@@ -151,16 +148,18 @@ The input to REST API to generate IoT Edge manifest for this workload will be as
 As you can see in this workload definition, there is workload specific configuration applied as desired properties. Imagine having a core configuration management database across the organization that houses all the location specific information that can be applied at the time of IoT Edge manifest generation, thereby supporting the need for location specific configurations for IoT Edge workloads.
 
 
+As an example in this repository we have put together a sample PowerApp that assists the operator in assembling the workload and deploying it to IoTedge. In this case a PowerApps collects the configuration and integrates using PowerAutomate with the REST api to deploy the workload.
 
-
-<
-Talk about the PowerApp Interface that generates the MDR JSON....
->
-
+![PowerApps UX](./media/powerappsux.png) 
 
 
 ## Deploying the Solution
+The solution is deployed in 2 parts
+1. REST API - An installation bash script [setup.sh](../Install/setup.sh) creates all the resources required for depeloying Azure services frequired for the solution. The Azure resources created include
+    - Resource Group
+    - Function App 
+    - CosmosDB Account, Database and Containers
 
-
-## PowerApps Sample
-
+2. PowerApp solution installation - Steps to [install](../Install/PowerAppInstallationSteps.pptx)
+    - [PowerApp Install Solution Package](../Install/PowerTools4IoTEdge_1_0_0_7.zip) 
+    - Import [PowerApp Canvas App](../Install/PowerAppOperator4IoTEdge_1_0_0_7.zip)

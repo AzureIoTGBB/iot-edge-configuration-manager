@@ -1,0 +1,102 @@
+{
+    "modulesContent": {
+        "$edgeAgent": {
+            "properties.desired": {
+                "schemaVersion": "1.0",
+                "runtime": {
+                    "type": "docker",
+                    "settings": {
+                        "minDockerVersion": "v1.25",
+                        "loggingOptions": "",
+                        "registryCredentials": {
+                            "default": {
+                                "username": "paddycontainers",
+                                "password": "WjPE2ARO6sAs/ytqEjyLlhmVG7PiuXd1",
+                                "address": "paddycontainers.azurecr.io"
+                            }
+                        }
+                    }
+                },
+                "systemModules": {
+                    "edgeAgent": {
+                        "type": "docker",
+                        "settings": {
+                            "image": "mcr.microsoft.com/azureiotedge-agent:1.0.10",
+                            "createOptions": {}
+                        }
+                    },
+                    "edgeHub": {
+                        "type": "docker",
+                        "status": "running",
+                        "restartPolicy": "always",
+                        "settings": {
+                            "image": "mcr.microsoft.com/azureiotedge-hub:1.0.10",
+                            "createOptions": {
+                                "HostConfig": {
+                                    "PortBindings": {
+                                        "5671/tcp": [
+                                            {
+                                                "HostPort": "5671"
+                                            }
+                                        ],
+                                        "8883/tcp": [
+                                            {
+                                                "HostPort": "8883"
+                                            }
+                                        ],
+                                        "443/tcp": [
+                                            {
+                                                "HostPort": "443"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "modules": {
+                    "A": {
+                        "version": "1.0",
+                        "type": "docker",
+                        "status": "running",
+                        "restartPolicy": "always",
+                        "settings": {
+                            "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0",
+                            "createOptions": "{}"
+                        }
+                    },
+                    "B": {
+                        "version": "1.0",
+                        "type": "docker",
+                        "status": "running",
+                        "restartPolicy": "always",
+                        "settings": {
+                            "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0",
+                            "createOptions": "{}"
+                        }
+                    }
+                }
+            }
+        },
+        "$edgeHub": {
+            "properties.desired": {
+                "schemaVersion": "1.0",
+                "routes": {
+                    "A2Cloud": "FROM /messages/modules/A/outputs/* INTO $upstream",
+                    "A2B": "FROM /messages/modules/A/outputs/* INTO BrokeredEndpoint(\"/modules/B/inputs/input\")",
+                    "B2Cloud": "FROM /messages/modules/B/outputs/* INTO $upstream"
+                },
+                "storeAndForwardConfiguration": {
+                    "timeToLiveSecs": 7200
+                }
+            }
+        },
+        "B": {
+            "properties.desired": {
+                "name": "jay"
+            }
+        }
+    },
+    "deviceContent": null
+}

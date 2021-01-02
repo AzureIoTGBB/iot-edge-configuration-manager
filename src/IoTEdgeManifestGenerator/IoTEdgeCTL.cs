@@ -61,12 +61,15 @@ namespace IotEdgeConfigurationManager.Manifest
             {
                     //Next is applying  Desired  Properties for each module
                     string mdprDPJSON = JsonConvert.SerializeObject(instanceMDPR.DesiredProperties);
-                    //The moduleInstanceconfig now contains 2 Keys - "properties.desired" & "routes"
-                    //Extract properties.desired
-                    //construct properties.desired object
-                    string desiredPropertiesJSON = $"{{\"properties.desired\":{mdprDPJSON}}}";
-                    Object desiredPropertiesObj  = JsonConvert.DeserializeObject(desiredPropertiesJSON);
-                    modulesDesiredPropertiesDICT.Add(instanceMDPR.ModuleInstanceName,desiredPropertiesObj);            
+                    if (mdprDPJSON != "null") {
+                        //The moduleInstanceconfig now contains 2 Keys - "properties.desired" & "routes"
+                        //Extract properties.desired
+                        //construct properties.desired object
+                        string desiredPropertiesJSON = $"{{\"properties.desired\":{mdprDPJSON}}}";
+                        Object desiredPropertiesObj  = JsonConvert.DeserializeObject(desiredPropertiesJSON);
+                        modulesDesiredPropertiesDICT.Add(instanceMDPR.ModuleInstanceName,desiredPropertiesObj);    
+                    }
+        
             }
             return modulesDesiredPropertiesDICT;        
         }
@@ -86,19 +89,19 @@ namespace IotEdgeConfigurationManager.Manifest
                     if (instanceMDPR.Routes != null)
                         //Form the Routes
                         foreach(ModuleRoute r in instanceMDPR.Routes) 
-                    {
-                        routeFrom = String.Format("\"{0}\":\"FROM /messages/modules/{1}/outputs/{2}",r.RouteInstanceName, r.FromModule, r.FromChannel);
-                        if (r.ToIoThub) {
-                            routeTo = $" INTO $upstream\"";
-                        } else
                         {
-                            routeTo = String.Format(" INTO BrokeredEndpoint(\\\"/modules/{0}/inputs/{1}\\\")\"",r.ToModule,r.ToChannel);
+                            routeFrom = String.Format("\"{0}\":\"FROM /messages/modules/{1}/outputs/{2}",r.RouteInstanceName, r.FromModule, r.FromChannel);
+                            if (r.ToIoThub) {
+                                routeTo = $" INTO $upstream\"";
+                            } else
+                            {
+                                routeTo = String.Format(" INTO BrokeredEndpoint(\\\"/modules/{0}/inputs/{1}\\\")\"",r.ToModule,r.ToChannel);
+                            }
+                            if  (routes.Length > 0)
+                                routes = routes + ",\n" + $"{routeFrom}{routeTo}";
+                            else
+                                routes = routes + "\n" + $"{routeFrom}{routeTo}";
                         }
-                        if  (routes.Length > 0)
-                            routes = routes + ",\n" + $"{routeFrom}{routeTo}";
-                        else
-                            routes = routes + "\n" + $"{routeFrom}{routeTo}";
-                    }
                 }
                 routes = $"{{ {routes} }}";
                 //Transform $edgeHub 
@@ -111,6 +114,7 @@ namespace IotEdgeConfigurationManager.Manifest
                 string routesObjStr = JsonConvert.SerializeObject(edgeHubDesiredPropertiesObj["routes"]);
                 //Replace routes in properties.desired for $edgeHub with routes from input
                 edgeHubDesiredPropertiesObj["routes"] = JsonConvert.DeserializeObject(routes);
+                edgeHubObj["properties.desired"] = edgeHubDesiredPropertiesObj;                
                 return edgeHubObj;
 
         }
@@ -161,6 +165,8 @@ namespace IotEdgeConfigurationManager.Manifest
             {
                 ModulesContent = modulesContentConfigContent
             }; 
+            Console.WriteLine(JsonConvert.SerializeObject(modConfigContent));
+
             return modConfigContent;
         }
     
