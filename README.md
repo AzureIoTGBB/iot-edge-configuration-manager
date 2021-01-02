@@ -3,14 +3,14 @@ readme.md
 
 This project provides an approach to configure workloads on a fleet of IoT Edge. A workload is one or more Docker containers running as IoT Edge Modules.
 
-The goal is to provide both guidance as well as a sample implementation for deploying workloads to IoT Edge.
+The goal is to provide both guidance as well as a sample implementation for deploying workloads to IoT Edge. 
 
 <br>
 
 ## Table of contents
 * [Engage and contribute](#engage-and-contribute)
 * [Solution goals](#solution-goals)
-* [Solution architecture & components](#solution-architecture-&-components)
+* [Solution architecture and components](#solution-architecture-and-components)
 * [PowerApps sample](#powerapps-sample)
 
 <br>
@@ -44,7 +44,7 @@ This solution uses a configuration store to apply the appropriate location speci
 <br>
 <br>
 
-## Solution architecture & components
+## Solution architecture and components
 
 ![REST API Deployment](./media/restapiflow.png) 
 The solution is implemented as a REST API in Azure Functions, and accepts a JSON document that defines the modules, desired properties and routes [MDR] for each of the modules that constitutes the workload. The REST API uses [Azure IoT Hub Service .NET SDK](https://github.com/Azure/azure-iot-sdk-csharp) to interact with Azure IoT Hub for deployment to IoT Edge. [CosmosDB](https://docs.microsoft.com/en-us/azure/cosmos-db/introduction) is used as the data store for Edge Manifest & Module definition.
@@ -148,6 +148,7 @@ The input to REST API to generate IoT Edge manifest for this workload is as foll
 As you can see in this workload definition, there is workload specific configuration applied as desired properties. Imagine having a core configuration management database across the organization that houses all the location specific information that can be applied at the time of IoT Edge manifest generation, thereby supporting the need for location specific configurations for IoT Edge workloads.
 
 
+## PowerApps sample
 As an example in this repository we have put together a sample PowerApp that assists the operator in assembling the workload and deploying it to IoTedge. In this case a PowerApps collects the configuration and integrates using PowerAutomate with the REST api to deploy the workload.
 
 ![PowerApps UX](./media/powerappsux.png) 
