@@ -156,11 +156,11 @@ As an example in this repository we have put together a sample PowerApp that ass
 
 ## Deploying the Solution
 The solution is deployed in 2 parts
-1. REST API - An installation bash script [setup.sh](../Install/setup.sh) creates all the resources required for depeloying Azure services frequired for the solution. The Azure resources created include
+1. REST API - An installation bash script [setup.sh](s./Install/setup.sh) creates all the resources required for depeloying Azure services frequired for the solution. The Azure resources created include
     - Resource Group
     - Function App 
     - CosmosDB Account, Database and Containers
 
-2. PowerApp solution installation - Steps to [install](../Install/PowerAppInstallationSteps.pptx)
-    - [PowerApp Install Solution Package](../Install/PowerTools4IoTEdge_1_0_0_7.zip) 
-    - Import [PowerApp Canvas App](../Install/PowerAppOperator4IoTEdge_1_0_0_7.zip)
+2. PowerApp solution installation - Steps to [install](./Install/PowerAppInstallationSteps.pptx)
+    - [PowerApp Install Solution Package](./Install/PowerTools4IoTEdge_1_0_0_7.zip) 
+    - Import [PowerApp Canvas App](./Install/PowerAppOperator4IoTEdge_1_0_0_7.zip)
