@@ -161,6 +161,26 @@ The solution is deployed in 2 parts
     - Function App 
     - CosmosDB Account, Database and Containers
 
+The install script expects a local file with the name "install.settings.json". This file contains the various input values to create the Azure resources. Please update this file with appropriate values prior to executing the script.
+  ```
+  {
+    "RESOURCE_GROUP":"<NAME OF RESOURCE GROUP>",
+    "FUNCTIONAPP_NAME":"<NAME OF FUNCTION APP>",
+    "FUNCTIONAPP_STORAGE_ACCOUNT_NAME":"<NAME OF STORAGE ACCT FOR FUNCTION APP>",
+    "LOCATION":"<LOCATION>",
+    "APPINSIGHTS_NAME":"<NAME OF APPINSIGHT FOR FUNCTIONAPP",
+    "IOTHUB_NAME":"<NAME OF IOT HUB>",
+    "IOTHUB_CONN_STRING_CSHARP":"<IOTHUBOWNER CONNECTION STRING>",
+    "ACR":"<NAME OF AZURE CONTAINER REGISTRY>",
+    "ACRUSER":"<AZURE CONTAINER REGISTRY USER NAME>",
+    "ACRPASSWORD":"<AZURE CONTAINER REGISTRY USER PASSWORD>",
+    "COSMOSACCOUNTNAME":"<NAME OF COSMOS ACCOUNT>",
+    "COSMOSDBNAME":"<NAME COSMOS DATABASE>",
+    "COSMOSCONTAINER_ALLMODULES":"allmodules",
+    "COSMOSCONTAINER_MANIFEST":"manifest"
+}
+  ```
+
 2. PowerApp solution installation - Steps to [install](./Install/PowerAppInstallationSteps.pptx)
     - [PowerApp Install Solution Package](./Install/PowerTools4IoTEdge_1_0_0_7.zip) 
     - Import [PowerApp Canvas App](./Install/PowerAppOperator4IoTEdge_1_0_0_7.zip)

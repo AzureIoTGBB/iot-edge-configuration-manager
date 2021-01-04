@@ -10,7 +10,7 @@ NC='\033[0m' # No Color
 
 
 function loadInputs() {
-    inputs=`cat local.settings.json`
+    inputs=`cat install.settings.json`
     RESOURCE_GROUP=`echo $inputs | jq '.RESOURCE_GROUP'`
     RESOURCE_GROUP=`echo $RESOURCE_GROUP | tr -d '"'`
 
@@ -77,7 +77,7 @@ function createRG() {
 }
 
 function createCosmosDBwithContainers(){
-    echo "${BLUE} Creating CosmosDB Account ${COSMOSACCOUNTNAME}"
+    echo "${BLUE}   Creating CosmosDB Account ${COSMOSACCOUNTNAME}"
     # Create a Cosmos account for SQL API
     az cosmosdb create \
         --name $COSMOSACCOUNTNAME \
@@ -87,7 +87,7 @@ function createCosmosDBwithContainers(){
         --output none
 
     # Create a SQL API database
-    echo "${BLUE} Creating SQL API Database ${COSMOSDBNAME}"
+    echo "${BLUE}Creating SQL API Database ${COSMOSDBNAME}"
     az cosmosdb sql database create \
         -a $COSMOSACCOUNTNAME \
         -g $RESOURCE_GROUP \
@@ -96,7 +96,7 @@ function createCosmosDBwithContainers(){
 
     # Define the index policy for the container, include spatial and composite indexes
     # Create a SQL API container for storing Module definitions
-    echo "${BLUE} Creating CosmosDB Container ${COSMOSCONTAINER_ALLMODULES}"
+    echo "${BLUE}   Creating CosmosDB Container ${COSMOSCONTAINER_ALLMODULES}"
     az cosmosdb sql container create \
         -a $COSMOSACCOUNTNAME \
         -g $RESOURCE_GROUP \
@@ -108,7 +108,7 @@ function createCosmosDBwithContainers(){
         --output  none
 
     # Create a SQL API container for storing Manifest definitions
-    echo "${BLUE} Creating CosmosDB Container ${COSMOSCONTAINER_MANIFEST}"
+    echo "${BLUE}   Creating CosmosDB Container ${COSMOSCONTAINER_MANIFEST}"
     az cosmosdb sql container create \
         -a $COSMOSACCOUNTNAME \
         -g $RESOURCE_GROUP \
@@ -123,7 +123,7 @@ function createCosmosDBwithContainers(){
 
 function retreiveCosmosDBkeys(){
      # Get the Keys for CosmosDB
-    echo "${BLUE}Retreiving Connection Information for CosmosDB ${COSMOSACCOUNTNAME}"
+    echo "${BLUE}   Retreiving Connection Information for CosmosDB ${COSMOSACCOUNTNAME}"
     COSMOSKEY=`az cosmosdb keys list --name $COSMOSACCOUNTNAME --resource-group $RESOURCE_GROUP  --type keys | jq '.primaryMasterKey'`
     #Remove "
     COSMOSKEY=`echo $COSMOSKEY | tr -d '"'`
@@ -134,14 +134,14 @@ function retreiveCosmosDBkeys(){
 }
 
 function createFunctionApp() {
-    echo "${BLUE}Creating Azure Function Storage Account ${FUNCTIONAPP_STORAGE_ACCOUNT_NAME}"
+    echo "${BLUE}   Creating Azure Function Storage Account ${FUNCTIONAPP_STORAGE_ACCOUNT_NAME}"
     az storage account create \
     -n $FUNCTIONAPP_STORAGE_ACCOUNT_NAME \
     -g $RESOURCE_GROUP \
     --sku Standard_LRS  \
     --output  none
 
-    echo "${BLUE}Retreiving Azure Function Storage Account ${FUNCTIONAPP_STORAGE_ACCOUNT_NAME}"
+    echo "${BLUE}   Retreiving Azure Function Storage Account ${FUNCTIONAPP_STORAGE_ACCOUNT_NAME}"
     FUNCTIONAPP_STORAGE_CONN_STRING=`az storage account show-connection-string \
     -g $RESOURCE_GROUP \
     -n $FUNCTIONAPP_STORAGE_ACCOUNT_NAME \
@@ -149,14 +149,14 @@ function createFunctionApp() {
     #Remove doublequots
     FUNCTIONAPP_STORAGE_CONN_STRING=`echo $FUNCTIONAPP_STORAGE_CONN_STRING | tr -d '"'`
 
-    echo "${BLUE}Creating App Insights ${APPINSIGHTS_NAME}"
+    echo "${BLUE}   Creating App Insights ${APPINSIGHTS_NAME}"
     az resource create \
     -g $RESOURCE_GROUP -n $APPINSIGHTS_NAME \
     --resource-type "Microsoft.Insights/components" \
     --properties "{\"Application_Type\":\"web\"}"  \
     --output  none
 
-    echo "${BLUE}Creating Azure Function App ${FUNCTIONAPP_NAME}"
+    echo "${BLUE}   Creating Azure Function App ${FUNCTIONAPP_NAME}"
     az functionapp create \
     -n $FUNCTIONAPP_NAME \
     --storage-account $FUNCTIONAPP_STORAGE_ACCOUNT_NAME \
@@ -247,12 +247,12 @@ function applyFunctionAppSettings() {
     rm ./appsettings.json
 
     #Restart Azure Function
-    echo "${YELLOW}Restarting ${FUNCTIONAPP_NAME}"
+    echo "${YELLOW} Restarting ${FUNCTIONAPP_NAME}"
     az functionapp restart --name $FUNCTIONAPP_NAME --resource-group $RESOURCE_GROUP  --output  none
 }
 
 function insertManifestAndModuleDocs() {
-    echo "${BLUE}Retreiving URL for Function : SetupConfigurationDB"
+    echo "${BLUE}   Retreiving URL for Function : SetupConfigurationDB"
     # Setup CosmosDB with Starter Documents....
     funcURL=`az functionapp function show -g $RESOURCE_GROUP -n $FUNCTIONAPP_NAME --function-name SetupConfigurationDB | jq .'invokeUrlTemplate'`
     funcURL=`echo $funcURL | tr -d '"'`
@@ -264,12 +264,12 @@ function insertManifestAndModuleDocs() {
 
 
     #Add Manifest Document
-    echo "${BLUE}Adding Manifest to CosmosDB via Function:SetupConfigurationDB"
+    echo "${BLUE}   Adding Manifest to CosmosDB via Function:SetupConfigurationDB"
     manifesturl=$funcURL"&coll=man"
     curl -X POST -H "Content-Type: application/json" -d @manifest.json $manifesturl
 
     #Add Module Document
-    echo "${BLUE}Adding Module to CodmosDB via Function:SetupConfigurationDB"
+    echo "${BLUE}   Adding Module to CodmosDB via Function:SetupConfigurationDB"
     moduleurl=$funcURL"&coll=mod"
     curl -X POST -H "Content-Type: application/json" -d @SimulatedTempSensor.json $moduleurl 
 }
