@@ -180,6 +180,14 @@ The install script expects a local file with the name "install.settings.json". T
     "COSMOSCONTAINER_MANIFEST":"manifest"
 }
   ```
+The install script can be eexecuted from Azure Cloud Shell or from any BASH shell. The installation script requires the following files
+* setup.sh
+* install.settings.json (the inputs)
+* idxpolicy.json (cosmosdb index policy)
+* manifest.json (IoT Edge manifest template)
+* SimulatedTempSensor.json (Sample IoTEdge Module definition)
+
+
 
 2. PowerApp solution installation - Steps to [install](./Install/PowerAppInstallationSteps.pptx)
     - [PowerApp Install Solution Package](./Install/PowerTools4IoTEdge_1_0_0_7.zip) 

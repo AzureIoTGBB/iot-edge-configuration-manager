@@ -89,18 +89,25 @@ namespace IoTEdgeConfigurationManager.Manifest
                 }
                 item = await cosmosCollection.UpsertItemAsync(requestBodyObj);  
                 string responseMessage;
-                if ( item.StatusCode == HttpStatusCode.Created ){
+                if ( item.StatusCode == HttpStatusCode.Created  ) {
                     responseMessage =  $"Hello, Caller. Document inserted into {collName}";
                     return new OkObjectResult(responseMessage);
                 }
+                else if (item.StatusCode == HttpStatusCode.OK) {
+                    responseMessage =  $"Hello, Caller. Document updated in {collName}";
+                    return new OkObjectResult(responseMessage);
+                }
                 else {
+                    log.LogError($"StatusCode = {item.StatusCode}");
                     responseMessage = $"Error Creating configuration data for {collName}";
+                    log.LogError($"{responseMessage}");
                     return new BadRequestObjectResult(responseMessage);
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine($"{e}");
+                log.LogError($"{cosmosaccountname} {cosmosendpoint}");
                 log.LogError($"{e}");
                 return new BadRequestObjectResult($"{e}");
             }
