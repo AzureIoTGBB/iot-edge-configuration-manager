@@ -192,3 +192,16 @@ The install script can be eexecuted from Azure Cloud Shell or from any BASH shel
 2. PowerApp solution installation - Steps to [install](./Install/PowerAppInstallationSteps.pptx)
     - [PowerApp Install Solution Package](./Install/PowerTools4IoTEdge_1_0_0_7.zip) 
     - Import [PowerApp Canvas App](./Install/PowerAppOperator4IoTEdge_1_0_0_7.zip)
+
+
+## Using the PowerApp 
+After successful deployment of Azure Function (IoTEdgeCTL), PowerAppOperator4IoTEdge and PowerAutomate2IoTEdgeCTL, its time to use the PowerApp.
+
+In the PowerApp, we need to setup the following item
+a. Edge
+b. Modules
+c. Edge Modules
+d. Edge Routes
+
+### Edge Definition
+In PowerApp

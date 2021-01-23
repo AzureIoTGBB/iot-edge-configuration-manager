@@ -354,6 +354,7 @@ then
    echo -e "${YELLOW}CosmosDB exists, so skipping creation..."
    cosmosExists=true
 else 
+    cosmosExists=false
     createCosmosDBwithContainers
 fi
 echo -e "${YELLOW}Press to continue..."
