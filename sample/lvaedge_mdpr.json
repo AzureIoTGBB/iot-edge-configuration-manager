@@ -1,0 +1,38 @@
+[
+    {
+      "ModuleInstanceName": "influxdb",
+      "Module": "Influxdb",
+      "DesiredProperties": null,
+      "Routes": []
+    },
+    {
+      "ModuleInstanceName": "edgetoinfluxdb",
+      "Module": "EdgeToInfluxdb",
+      "DesiredProperties": null,
+      "Routes": []
+    },
+    {
+      "ModuleInstanceName": "grafana",
+      "Module": "Grafana",
+      "DesiredProperties": null,
+      "Routes": []
+    },
+    {
+      "ModuleInstanceName": "telegraf",
+      "Module": "Telegraf",
+      "DesiredProperties": null,
+      "Routes": []
+    },
+    {
+      "ModuleInstanceName": "opcsimulator",
+      "Module": "OPCSimulator",
+      "DesiredProperties": null,
+      "Routes": []
+    },
+    {
+      "ModuleInstanceName": "containerinsights",
+      "Module": "ContainerInsights",
+      "DesiredProperties": null,
+      "Routes": []
+    }
+  ]

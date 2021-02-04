@@ -1,0 +1,61 @@
+[
+    {
+      "ModuleInstanceName": "influxdb",
+      "Module": "Influxdb",
+      "DesiredProperties": null,
+      "Routes": []
+    },
+    {
+      "ModuleInstanceName": "opcpublisher",
+      "Module": "OPCPublisher",
+      "DesiredProperties": null,
+      "Routes": [
+        {
+          "RouteInstanceName": "opctoinfluxdb",
+          "FromModule": "opcpublisher",
+          "ToModule": "edgetoinfluxdb",
+          "FromChannel": "*",
+          "ToChannel": "input1",
+          "ToIoThub": false
+        },
+        {
+          "RouteInstanceName": "tocloud",
+          "FromModule": "opcpublisher",
+          "ToModule": null,
+          "FromChannel": "*",
+          "ToChannel": null,
+          "ToIoThub": true
+        }
+      ]
+    },
+    {
+      "ModuleInstanceName": "edgetoinfluxdb",
+      "Module": "EdgeToInfluxdb",
+      "DesiredProperties": null,
+      "Routes": []
+    },
+    {
+      "ModuleInstanceName": "grafana",
+      "Module": "Grafana",
+      "DesiredProperties": null,
+      "Routes": []
+    },
+    {
+      "ModuleInstanceName": "telegraf",
+      "Module": "Telegraf",
+      "DesiredProperties": null,
+      "Routes": []
+    },
+    {
+      "ModuleInstanceName": "opcsimulator",
+      "Module": "OPCSimulator",
+      "DesiredProperties": null,
+      "Routes": []
+    },
+    {
+      "ModuleInstanceName": "containerinsights",
+      "Module": "ContainerInsights",
+      "DesiredProperties": null,
+      "Routes": []
+    }
+  ]

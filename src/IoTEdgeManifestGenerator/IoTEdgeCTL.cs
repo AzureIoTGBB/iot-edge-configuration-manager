@@ -90,7 +90,10 @@ namespace IotEdgeConfigurationManager.Manifest
                         //Form the Routes
                         foreach(ModuleRoute r in instanceMDPR.Routes) 
                         {
-                            routeFrom = String.Format("\"{0}\":\"FROM /messages/modules/{1}/outputs/{2}",r.RouteInstanceName, r.FromModule, r.FromChannel);
+                            if ( r.FromChannel.Equals("*"))
+                                routeFrom = String.Format("\"{0}\":\"FROM /messages/modules/{1}/{2}",r.RouteInstanceName, r.FromModule, r.FromChannel);
+                            else
+                                routeFrom = String.Format("\"{0}\":\"FROM /messages/modules/{1}/outputs/{2}",r.RouteInstanceName, r.FromModule, r.FromChannel);
                             if (r.ToIoThub) {
                                 routeTo = $" INTO $upstream\"";
                             } else
