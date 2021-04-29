@@ -3,7 +3,7 @@ readme.md
 
 This project provides an approach to configure workloads on a fleet of IoT Edge. A workload is one or more Docker containers running as IoT Edge Modules.
 
-The goal is to provide both guidance as well as a sample implementation for deploying workloads to IoT Edge. 
+The goal is to provide both guidance as well as a sample implementation for deploying workloads to IoT Edge. There are few issues with the way the deployment is getting submitted and needs to be remediated, as well the integration with the database for PowerApps currently is manual.But the code provides a general idea that can be improved and built on.
 
 <br>
 
@@ -190,8 +190,7 @@ The install script can be eexecuted from Azure Cloud Shell or from any BASH shel
 
 
 2. PowerApp solution installation - Steps to [install](./Install/PowerAppInstallationSteps.pptx)
-    - [PowerApp Install Solution Package](./Install/PowerTools4IoTEdge_1_0_0_7.zip) 
-    - Import [PowerApp Canvas App](./Install/PowerAppOperator4IoTEdge_1_0_0_7.zip)
+    - [PowerApp Install Solution Package](./Install/PowerTools4IoTEdge_1_0_0_11.zip) 
 
 
 ## Using the PowerApp 
